@@ -1,0 +1,53 @@
+name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(Rev:.r)
+
+variables:
+  var1: value1
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+jobs:
+- job: BuildFunctionApp
+  displayName: Build Function App
+  pool: HOJ
+  continueOnError: false
+  workspace:
+    clean: outputs
+  steps:
+  - powershell: './scripts/build.ps1' 
+    displayName: 'Create Functions Zip'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '.\TestRunner.Functions\dist'
+      ArtifactName: 'dist'
+      ArtifactType: 'Container'
+    displayName: 'Publish dist folder'
+
+- job: Build_Infrastructure_Code_Artifact
+  displayName: Build Infrastructure Code Artifact
+  pool: HOJ
+  continueOnError: false
+  workspace:
+    clean: outputs
+
+  steps:
+  - task: AzurePowerShell@2
+    inputs:
+      ConnectedServiceNameSelector: "ConnectedServiceNameARM"
+      ConnectedServiceNameARM: "Enterprise Demo (cdb8cc5e-6f73-4865-bc4c-3028e03f6157)"
+      ScriptPath: "scripts/Test-ARMTemplate.ps1"
+      preferredAzurePowerShellVersion: 'LatestVersion'
+    displayName: Test ARM Template
+    enabled: true
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: "scripts"
+      ArtifactName: "scripts"
+      ArtifactType: "Container"
+    displayName: Publish scripts Folder
+    enabled: true

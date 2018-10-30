@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
@@ -13,8 +12,7 @@ namespace TestRunner.Functions
     {
         [FunctionName("GetUploadUrl")]
         public static async Task<object> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
             var isMissingParameter = false;
             var errorMessage = "";
@@ -41,7 +39,7 @@ namespace TestRunner.Functions
             var environment = environmentParameter;
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                System.Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING", EnvironmentVariableTarget.Process));
+                Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING", EnvironmentVariableTarget.Process));
             var client = storageAccount.CreateCloudBlobClient();
             var container = client.GetContainerReference(environment);
             await container.CreateIfNotExistsAsync();

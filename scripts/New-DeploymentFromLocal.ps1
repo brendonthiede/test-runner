@@ -56,7 +56,7 @@ function New-AzResourceDeployment {
   Param ([string] $ResourceGroupName, [string] $ResourceLocation, [string] $TemplateFile)
   $TIMESTAMP = (Get-Date).ToString("yyyyMMdd-HHmm")
   $DEPLOYMENT_NAME = "FirstServerlessAppDeployment$TIMESTAMP"
-  az group create --name $ResourceGroupName --location $ResourceLocation --tag purpose=tutorial
+  az group create --name $ResourceGroupName --location $ResourceLocation --tag owner=devops
   if ($LASTEXITCODE -ne 0) { Invoke-ErrorReport "Could not create resource group" }
   $DEPLOYMENT_OUTPUTS = ((az group deployment create `
       --name $DEPLOYMENT_NAME `
@@ -80,15 +80,6 @@ function New-AzResourceDeployment {
   Return $DEPLOYMENT_OUTPUTS
 }
 
-function Initialize-StorageContainers {
-  Param ([string] $StorageAccountName)
-  az storage container create --name "images" --account-name $StorageAccountName --public-access blob
-  if ($LASTEXITCODE -ne 0) { Invoke-ErrorReport "Could not create storage container 'images' in $StorageAccountName" }
-  az storage container create --name "thumbnails" --account-name $StorageAccountName --public-access blob
-  if ($LASTEXITCODE -ne 0) { Invoke-ErrorReport "Could not create storage container 'thumbnails' in $StorageAccountName" }
-  az storage cors add --methods OPTIONS PUT --origins '*' --exposed-headers '*' --allowed-headers '*' --services b --account-name $StorageAccountName
-}
-
 Push-Location
 $PROJECT_ROOT = "$PSScriptRoot\..\"
 Set-Location $PROJECT_ROOT
@@ -103,7 +94,7 @@ if (!$ExcludeInfrastructure) {
   $FUNCTION_APP_NAME = $DEPLOYMENT_OUTPUTS.functionAppName.value
   $FUNCTION_APP_URL = "https://$($DEPLOYMENT_OUTPUTS.functionAppUri.value)"
   
-  Initialize-StorageContainers -StorageAccountName $FUNCTION_STORAGE_ACCOUNT_NAME
+  az storage cors add --methods OPTIONS PUT --origins '*' --exposed-headers '*' --allowed-headers '*' --services b --account-name $StorageAccountName
 }
 else {
   $FUNCTION_STORAGE_OBJECT = (az storage account list -g $ResourceGroupName | ConvertFrom-Json | Where-Object {$_.name -match '^serverless'})[0]
@@ -116,17 +107,7 @@ else {
 }
 
 # Compile Azure functions and package them for deployment
-Push-Location
-Set-Location "$PROJECT_ROOT\functions"
-$artifactFolder = "$($PWD.Path)\dist"
-$publishOut = "$artifactFolder\artifact"
-If (Test-path $artifactFolder) { Remove-Item $artifactFolder -Force -Recurse }
-dotnet publish functions.csproj --configuration Release --output $publishOut
-if ($LASTEXITCODE -ne 0) { Invoke-ErrorReport "Could not compile the Azure Functions" }
-Add-Type -assembly "system.io.compression.filesystem"
-[io.compression.zipfile]::CreateFromDirectory($publishOut, "$artifactFolder\functions.zip")
-Remove-Item $publishOut -Force -Recurse
-Pop-Location
+.\scripts\build.ps1
 
 # Deploy function to Azure
 az functionapp deployment source config-zip `
