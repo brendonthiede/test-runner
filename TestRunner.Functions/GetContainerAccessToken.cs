@@ -11,7 +11,7 @@ namespace TestRunner.Functions
     {
         [FunctionName("GetContainerAccessToken")]
         public static object Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "option", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", "option", Route = null)] HttpRequest req)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING", EnvironmentVariableTarget.Process));

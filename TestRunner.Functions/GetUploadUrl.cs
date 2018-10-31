@@ -12,7 +12,7 @@ namespace TestRunner.Functions
     {
         [FunctionName("GetUploadUrl")]
         public static async Task<object> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
         {
             var isMissingParameter = false;
             var errorMessage = "";

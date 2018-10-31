@@ -1,7 +1,7 @@
 [cmdletbinding()]
 param(
     [Parameter(Mandatory=$False)]
-    [ValidateSet("Test", "Publish")]
+    [ValidateSet("DeployFullConnected", "DeployFunctionsConnected", "DeployIACConnected", "Publish")]
     [string[]]
     $Task = 'Publish'
 )
@@ -57,5 +57,8 @@ Write-Output ""
 
 Push-Location
 Set-Location "$PSScriptRoot"
+. .\helpers\helpers.ps1
+Save-ShellAppearance
 Invoke-psake -buildFile "$PSScriptRoot\psakeBuild.ps1" -taskList $Task -Verbose:$VerbosePreference
+Reset-ShellAppearance
 Pop-Location
