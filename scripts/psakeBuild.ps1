@@ -38,7 +38,7 @@ task DeployIACConnected {
   az storage cors add --methods OPTIONS PUT --origins '*' --exposed-headers '*' --allowed-headers '*' --services b --account-name $script:FUNCTION_STORAGE_ACCOUNT_NAME
 }
 
-# Creates a NuGet package with the desired contents
+# Creates a zip file for deploying the function app
 task Publish {
   Push-Location
   Set-Location "$FUNCTIONS_ROOT"

@@ -1,5 +1,16 @@
 [cmdletbinding()]
 param(
+  # Name of the Application
+  [Parameter(Mandatory = $true)]
+  [string]
+  $ApplicationName,
+
+  # Name of the Application
+  [Parameter(Mandatory = $true)]
+  [string]
+  [ValidateSet("dev", "demo", "staging", "prod")]
+  $Environment,
+
   # Directory to run tests from
   [Parameter(Mandatory = $true)]
   [string]
@@ -8,39 +19,18 @@ param(
   # Test command to run
   [Parameter(Mandatory = $true)]
   [string]
-  $TestCommand
+  $TestCommand,
+
+  # If provided, this channel will get a message if there is a failure
+  [Parameter(Mandatory = $false)]
+  [string]
+  $FailureSlackChannel = ""
 )
 
-function Send-PSSlackMessage {
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]
-    $Message,
+. $PSScriptRoot\scripts\helpers\helpers.ps1
 
-    [Parameter(Mandatory = $true)]
-    [string]
-    $Channel,
-
-    [Parameter(Mandatory = $false)]
-    [string]
-    $SlackWebHookUri = [System.Environment]::GetEnvironmentVariable("SLACK_WEBHOOK_URI", "User")
-  )
-
-  if (!(Get-Command Send-SlackMessage)) {
-    if (!(Get-Module PSSlack)) {
-      Install-Module PSSlack -Scope CurrentUser
-    }
-    else {
-      Import-Module PSSlack
-    }
-  }
-  
-  Send-SlackMessage `
-    -Uri $SlackWebHookUri `
-    -Parse full `
-    -Text $Message `
-    -Channel $Channel
-}
+$WorkingDirectory = Get-FullPath($WorkingDirectory)
+Write-Verbose "WorkingDirectory: $WorkingDirectory"
 
 Push-Location
 
@@ -60,10 +50,26 @@ finally {
 }
 
 if ($TestExitCode -eq 0) {
-  Write-Host "Tests passed"
+  $TestStatus = "Passed"
 }
 else {
-  Write-Error "Tests failed"
+  $TestStatus = "Failed"
 }
+
+Write-Verbose "Tests $TestStatus"
+
+Push-Location
+Set-Location "$PSScriptRoot\scripts"
+
+.\Publish-TestResults.ps1 -TestStatus $TestStatus -Environment $Environment -TestResultsFolder "$WorkingDirectory\testresults" -ApplicationName $ApplicationName -Verbose:$VerbosePreference
+.\Update-TestResultsList.ps1 -Environment $Environment -Verbose:$VerbosePreference | Tee-Object -Variable ReportListUrl
+$ReportListUrl = $ReportListUrl[$ReportListUrl.length - 1]
+
+if ($TestStatus -eq "Failed" -and $FailureSlackChannel -ne "") {
+  $Message = "$ApplicationName tests failed in $Environment`: $ReportListUrl"
+  .\Send-PSSlackMessage.ps1 -Message $Message -Channel $FailureSlackChannel
+}
+
+Pop-Location
 
 Exit $TestExitCode

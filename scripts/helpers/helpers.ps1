@@ -22,6 +22,14 @@ function Invoke-ErrorReport {
   throw "$Message"
 }
 
+function Get-FullPath {
+  Param ([string] $path)
+  if (!([System.IO.Path]::IsPathRooted($path))) {
+    $path = Join-Path ($PWD) $path
+  }
+  return (([System.IO.Path]::GetFullPath($path)) -replace '[\\/]$','')
+}
+
 function Connect-AzSubscription {
   Param ([string] $EnvironmentName, [string] $SubscriptionName)
   $ACCOUNT_INFO = (az account show | ConvertFrom-Json)
@@ -75,4 +83,42 @@ function New-FunctionAppDeployment {
     --name $FunctionAppName `
     --src $ZipFile
   Assert-True -Value ($LASTEXITCODE -eq 0) -ErrorMessage "Could not deploy the Azure Functions"
+}
+
+function Publish-BlobFile {
+  param (
+    [Parameter(Mandatory=$false)]
+    [string]
+    $uploadUrl = $env:TEST_RESULT_UPLOAD_URL,
+    [Parameter(Mandatory=$true)]
+    [string]
+    $fileToUpload,
+    [Parameter(Mandatory=$true)]
+    [string]
+    $environment,
+    [Parameter(Mandatory=$true)]
+    [string]
+    $blobName
+  )
+  
+  $blobContentType = switch ([System.IO.Path]::GetExtension($fileToUpload)) {
+    ".html" { 'text/html' }
+    ".png" { 'image/png' }
+    ".json" { 'application/json' }
+    ".js" { 'application/javascript' }
+    Default { 'text/plain' }
+  }
+
+  Write-Verbose "Getting upload URL from $uploadUrl for /$environment/$blobName"
+  $body = @{environment = $environment; filename = "$blobName"}
+  $urlDest = (Invoke-RestMethod -Uri $UploadUrl -Body $body).url
+  
+  $webClient = New-Object System.Net.WebClient
+  $webClient.Headers.Add('Content-Type', 'application/octet-stream')
+  $webClient.Headers.Add('x-ms-version', '2017-04-17')
+  $webClient.Headers.Add('x-ms-blob-type', 'BlockBlob')
+  $webClient.Headers.Add('x-ms-blob-content-type', $blobContentType)
+  Write-Verbose "Calling UploadFile with $urlDest, `"PUT`", $fileToUpload"
+  $webClient.UploadFile($urlDest, "PUT", $fileToUpload)
+  return ($urlDest -replace '\?.*','')
 }

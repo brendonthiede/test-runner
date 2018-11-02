@@ -50,9 +50,9 @@ $psakeMinorVersion = $psakeVersion.Minor
 $psakeBuildVersion = $psakeVersion.Build
 
 Write-Output "Current tool versions:"
-Write-Output "  Azure CLI:         $azureCLIVersion"
-Write-Output "  AzureRM:           $azureRMMajorVersion.$azureRMMinorVersion.$azureRMBuildVersion"
-Write-Output "  Psake:             $psakeMajorVersion.$psakeMinorVersion.$psakeBuildVersion"
+Write-Output "  Azure CLI:  $azureCLIVersion"
+Write-Output "  AzureRM:    $azureRMMajorVersion.$azureRMMinorVersion.$azureRMBuildVersion"
+Write-Output "  Psake:      $psakeMajorVersion.$psakeMinorVersion.$psakeBuildVersion"
 Write-Output ""
 
 Push-Location

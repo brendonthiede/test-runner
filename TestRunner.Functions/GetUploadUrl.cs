@@ -55,7 +55,9 @@ namespace TestRunner.Functions
             var sasBlobToken = blob.GetSharedAccessSignature(adHocSAS);
             return new
             {
-                url = blob.Uri + sasBlobToken
+                url = blob.Uri + sasBlobToken,
+                blobUri = blob.Uri,
+                sasBlobToken
             };
         }
     }
