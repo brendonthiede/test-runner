@@ -1,9 +1,15 @@
 [cmdletbinding()]
 param(
-    [Parameter(Mandatory=$False)]
-    [ValidateSet("DeployFullConnected", "DeployFunctionsConnected", "DeployIACConnected", "Publish")]
-    [string[]]
-    $Task = 'Publish'
+  [Parameter(Mandatory=$False)]
+  [ValidateSet("DeployFullConnected", "DeployFunctionsConnected", "DeployIACConnected", "DeployWorker", "Publish")]
+  [string[]]
+  $Task = 'Publish',
+  [Parameter(Mandatory=$False)]
+  [string]
+  $WorkerSourceFolder = "$PSScriptRoot\..\TestRunner.Worker",
+  [Parameter(Mandatory=$False)]
+  [string]
+  $WorkerDestinationFolder = "C:\apps"
 )
 
 # Verify that we have the Azure CLI installed
@@ -57,5 +63,5 @@ Write-Output ""
 
 . $PSScriptRoot\..\TestRunner.Worker\lib\helpers.ps1
 Save-ShellAppearance
-Invoke-psake -buildFile "$PSScriptRoot\psakeBuild.ps1" -taskList $Task -Verbose:$VerbosePreference
+Invoke-psake -buildFile "$PSScriptRoot\psakeBuild.ps1" -taskList $Task -parameters @{"WorkerSourceFolder"="$WorkerSourceFolder";"WorkerDestinationFolder"="$WorkerDestinationFolder"} -Verbose:$VerbosePreference
 Reset-ShellAppearance
