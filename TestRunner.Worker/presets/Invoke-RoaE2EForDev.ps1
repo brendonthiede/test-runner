@@ -7,6 +7,6 @@ Set-Location $PSScriptRoot\..
   -Environment dev `
   -WorkingDirectory $PSScriptRoot\..\AppCode\ROA-dev\ `
   -TestCommand "npm run e2e-dev" `
-  -FailureSlackChannel "testy-testy" `
+  -FailureSlackChannel "roa-team-e2e" `
   -Verbose:$VerbosePreference
 Pop-Location
