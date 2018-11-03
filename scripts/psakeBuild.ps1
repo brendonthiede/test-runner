@@ -46,18 +46,14 @@ task DeployWorker {
   $WORKER_DESTINATION_FOLDER = Get-FullPath($WORKER_DESTINATION_FOLDER) -replace '[\\/]$', ''
   $SourceShortName = [System.IO.Path]::GetFileName("$WORKER_SOURCE_FOLDER")
   $Incremental = $false
-  if (!(Test-Path "$WORKER_DESTINATION_FOLDER")) {
-    Write-Verbose "Creating directory $WORKER_DESTINATION_FOLDER"
-    mkdir -Force "$WORKER_DESTINATION_FOLDER"
-  }
-
   if (Test-Path "$WORKER_DESTINATION_FOLDER\$SourceShortName") {
     $Incremental = $true
     Write-Verbose "Previously existing $WORKER_DESTINATION_FOLDER\$SourceShortName is being moved to $WORKER_DESTINATION_FOLDER\$SourceShortName.Old"
     Move-Item -Force "$WORKER_DESTINATION_FOLDER\$SourceShortName" "$WORKER_DESTINATION_FOLDER\$SourceShortName.Old"
   }
 
-  Copy-Item -Force "$WORKER_SOURCE_FOLDER\*" "$WORKER_DESTINATION_FOLDER\$SourceShortName" -Verbose:$VerbosePreference
+  mkdir -Force "$WORKER_DESTINATION_FOLDER\$SourceShortName" -Verbose:$VerbosePreference
+  Copy-Item -Force "$WORKER_SOURCE_FOLDER\*" "$WORKER_DESTINATION_FOLDER\$SourceShortName\" -Verbose:$VerbosePreference
   Copy-Item -Recurse -Force "$WORKER_SOURCE_FOLDER\lib" "$WORKER_DESTINATION_FOLDER\$SourceShortName\" -Verbose:$VerbosePreference
   Copy-Item -Recurse -Force "$WORKER_SOURCE_FOLDER\presets" "$WORKER_DESTINATION_FOLDER\$SourceShortName\" -Verbose:$VerbosePreference
 
