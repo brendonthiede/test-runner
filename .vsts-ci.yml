@@ -27,6 +27,20 @@ jobs:
       ArtifactType: 'Container'
     displayName: 'Publish dist folder'
 
+- job: PublishWorker
+  displayName: Publish Worker Scripts
+  pool: HOJ
+  continueOnError: false
+  workspace:
+    clean: outputs
+  steps:
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '.\TestRunner.Worker'
+      ArtifactName: 'TestRunner.Worker'
+      ArtifactType: 'Container'
+    displayName: 'Publish TestRunner.Worker folder'
+
 - job: Build_Infrastructure_Code_Artifact
   displayName: Build Infrastructure Code Artifact
   pool: HOJ
