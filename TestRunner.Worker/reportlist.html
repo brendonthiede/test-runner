@@ -8,17 +8,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
     crossorigin="anonymous">
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl"
-    crossorigin="anonymous"></script>
+  <style>
+    .header {
+      position: fixed;
+      top: 0;
+      z-index: 9000;
+      background-color: whitesmoke;
+      height: 50px;
+    }
+    .results {
+      margin-top: 60px;
+    }
+  </style>
 </head>
 
 <body>
-  <div style="margin-bottom: 1em">
-    <a href="#" class="btn btn-primary btn-md" role="button" onclick="showAll()">All</a>
-    <a href="#" class="btn btn-danger btn-md" role="button" onclick="hide('.Passed')">Failures</a>
-    <a href="#" class="btn btn-success btn-md" role="button" onclick="hide('.Failed')">Passes</a>
+  <div class="header w-100">
+    <div class="container">
+      <a href="#" class="btn btn-primary btn-md" role="button" onclick="showAll()">All</a>
+      <a href="#" class="btn btn-danger btn-md" role="button" onclick="hide('.Passed')">Failures</a>
+      <a href="#" class="btn btn-success btn-md" role="button" onclick="hide('.Failed')">Passes</a>
+      <span id="env-label" class="navbar-brand mb-0 h1 text-capitalize"></span>
+    </div>
   </div>
-  <div id="report-list">
+
+  <div class="container results" id="report-list">
   </div>
   <script>
     function showAll() {
@@ -65,17 +79,18 @@
 
     function loadReportList(reportList) {
       const reportListElem = document.querySelector('#report-list');
+      const envLabel = document.querySelector('#env-label');
       reportListElem.innerHTML = '';
       reportList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       reportList.forEach(report => {
         const reportElem = document.createElement('DIV');
         reportElem.innerHTML = `
-        <div class="alert alert-${ report.testStatus === 'Passed' ? 'success' : 'danger'} ${report.testStatus}" role="alert">
-            <a href="${ report.url}"><h2>${report.applicationName} - ${report.testStatus}</h2>
+        <a href="${ report.url}"><div class="alert alert-${report.testStatus === 'Passed' ? 'success' : 'danger'} ${report.testStatus}" role="alert">
+            <h2>${report.applicationName} - ${report.testStatus}</h2>
             ${ getFormatedDate(new Date(report.timestamp))}
-            </a>
-        </div>`;
+        </div></a>`;
         reportListElem.appendChild(reportElem);
+        envLabel.innerHTML = report.environment;
       });
     }
 
