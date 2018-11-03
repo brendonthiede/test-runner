@@ -27,10 +27,14 @@ param(
   $FailureSlackChannel = ""
 )
 
-. $PSScriptRoot\scripts\helpers\helpers.ps1
+. $PSScriptRoot\lib\helpers.ps1
 
 $WorkingDirectory = Get-FullPath($WorkingDirectory)
 Write-Verbose "WorkingDirectory: $WorkingDirectory"
+
+if (!(Test-Path $WorkingDirectory)) {
+  throw "$WorkingDirectory does not exist"
+}
 
 Push-Location
 
@@ -59,7 +63,7 @@ else {
 Write-Verbose "Tests $TestStatus"
 
 Push-Location
-Set-Location "$PSScriptRoot\scripts"
+Set-Location "$PSScriptRoot"
 
 .\Publish-TestResults.ps1 -TestStatus $TestStatus -Environment $Environment -TestResultsFolder "$WorkingDirectory\testresults" -ApplicationName $ApplicationName -Verbose:$VerbosePreference
 .\Update-TestResultsList.ps1 -Environment $Environment -Verbose:$VerbosePreference | Tee-Object -Variable ReportListUrl

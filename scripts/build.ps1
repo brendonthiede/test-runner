@@ -55,10 +55,7 @@ Write-Output "  AzureRM:    $azureRMMajorVersion.$azureRMMinorVersion.$azureRMBu
 Write-Output "  Psake:      $psakeMajorVersion.$psakeMinorVersion.$psakeBuildVersion"
 Write-Output ""
 
-Push-Location
-Set-Location "$PSScriptRoot"
-. .\helpers\helpers.ps1
+. $PSScriptRoot\..\TestRunner.Worker\lib\helpers.ps1
 Save-ShellAppearance
 Invoke-psake -buildFile "$PSScriptRoot\psakeBuild.ps1" -taskList $Task -Verbose:$VerbosePreference
 Reset-ShellAppearance
-Pop-Location

@@ -1,4 +1,4 @@
-. .\helpers\helpers.ps1
+. $PSScriptRoot\..\TestRunner.Worker\lib\helpers.ps1
 
 properties {
   $FUNCTIONS_ROOT = "$PSScriptRoot\..\TestRunner.Functions";

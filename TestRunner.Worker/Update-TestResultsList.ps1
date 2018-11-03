@@ -12,7 +12,7 @@ param (
   $Environment
 )
 
-. $PSScriptRoot\helpers\helpers.ps1
+. $PSScriptRoot\lib\helpers.ps1
 
 [System.Collections.ArrayList]$Reports = New-Object System.Collections.ArrayList
 $today = (Get-Date)
@@ -51,7 +51,7 @@ for ($i = 0; $i -lt 3; $i++) {
 }
 
 $blobName = "reportlist.json"
-$fileName = "$PSScriptRoot\..\$blobName"
+$fileName = "$PSScriptRoot\$blobName"
 
 $Reports | ConvertTo-Json | Tee-Object -Variable reportJson | Set-Content -Path $fileName
 Write-Verbose "reportJson:`n$reportJson"
@@ -63,7 +63,7 @@ Write-Verbose "UploadUrl: $UploadUrl"
 Publish-BlobFile -uploadUrl $UploadUrl -fileToUpload $sourceFilePath -environment $Environment -blobName $blobName -Verbose:$VerbosePreference
 
 $blobName = "reportlist.html"
-$fileName = "$PSScriptRoot\..\$blobName"
+$fileName = "$PSScriptRoot\$blobName"
 
 Write-Verbose "Publishing reportlist HTML to Azure storage"
 $sourceFilePath = Get-FullPath($fileName)

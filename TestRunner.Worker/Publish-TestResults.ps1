@@ -23,7 +23,7 @@ param (
   $ReportFilename = "report.html"
 )
 
-. $PSScriptRoot\helpers\helpers.ps1
+. $PSScriptRoot\lib\helpers.ps1
 
 $datePrefix = (Get-Date -Format "yyyy-MM-dd")
 $timePrefix = (Get-Date -Format "HH_mm_ss")
@@ -31,6 +31,13 @@ $blobName = "$datePrefix/$timeprefix,$TestStatus,$Environment,$ApplicationName,$
 Write-Verbose "TestResultsFolder: $TestResultsFolder"
 $TestResultsFolder = Get-FullPath($TestResultsFolder)
 $sourceFilePath = "$TestResultsFolder\$reportFilename"
+
+if (!(Test-Path $TestResultsFolder)) {
+  throw "Test results folder $TestResultsFolder could not be found"
+}
+if (!(Test-Path $sourceFilePath)) {
+  throw "Test results report $sourceFilePath could not be found"
+}
 
 Write-Verbose "Publishing report to Azure storage"
 
