@@ -59,8 +59,8 @@
       if (hours === 0) {
         hours = 12;
       }
-      return timestamp.getDate() + "/"
-        + (timestamp.getMonth() + 1) + "/"
+      return (timestamp.getMonth() + 1) + "/"
+        + timestamp.getDate() + "/"
         + timestamp.getFullYear() + " @ "
         + hours + ":"
         + minutes
