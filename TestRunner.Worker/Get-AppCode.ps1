@@ -54,6 +54,10 @@ if ($GitRevision -ne "") {
 }
 npm install
 
+if (Test-Path .\node_modules\.bin\webdriver-manager) {
+  .\node_modules\.bin\webdriver-manager update
+}
+
 Set-Location $PSScriptRoot\AppCode
 if (Test-Path $TargetFolder) {
   Move-Item $TargetFolder $SwapFolder
