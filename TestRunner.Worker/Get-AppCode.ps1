@@ -65,6 +65,15 @@ if (Test-Path $TargetFolder) {
 
 Move-Item $TempFolder $TargetFolder
 
+Push-Location
+Set-Location $TargetFolder
+npm install
+
+if (Test-Path .\node_modules\.bin\webdriver-manager) {
+  .\node_modules\.bin\webdriver-manager update
+}
+Pop-Location
+
 while ((Test-Path $SwapFolder)) {
   Remove-Item -Recurse -Force $SwapFolder
 }
