@@ -36,7 +36,7 @@ Set-Location $PSScriptRoot\AppCode
 
 if ($PersonalAccessToken -ne "") {
   if (!($GitUrl -match '^https://.*')) {
-    throw "Only HTTPS URLs are allowed with a Persaonl Access Token"
+    throw "Only HTTPS URLs are allowed with a Personal Access Token"
   }  
   $GitUrl = $GitUrl -replace '^https://', "https://Personal%20Access%20Token:$($PersonalAccessToken)@"
 }
