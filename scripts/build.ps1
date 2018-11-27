@@ -65,3 +65,8 @@ Write-Output ""
 Save-ShellAppearance
 Invoke-psake -buildFile "$PSScriptRoot\psakeBuild.ps1" -taskList $Task -parameters @{"WorkerSourceFolder"="$WorkerSourceFolder";"WorkerDestinationFolder"="$WorkerDestinationFolder"} -Verbose:$VerbosePreference
 Reset-ShellAppearance
+
+if (!$psake.build_success) {
+  Write-Error "PSake build failed"
+  exit 1
+}
