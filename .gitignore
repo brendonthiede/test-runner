@@ -4,6 +4,7 @@
 # Misc, project specific files
 reportlist.json
 AppCode
+/TestRunner.Functions/dist/
 
 # Azure Functions localsettings file
 local.settings.json
