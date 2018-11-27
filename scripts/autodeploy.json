@@ -37,8 +37,7 @@
     "appServiceApiVersion": "2016-08-01",
     "functionExtensionVersion": "~2",
     "functionWorkerRuntime": "dotnet",
-    "functionAppId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionAppName'))]",
-    "jisCommonId": "[concat(subscription().id, '/resourceGroups/jiscommon-demo-rg/providers/Microsoft.Web/serverfarms/jiscommon-demo-asplan')]"
+    "functionAppId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionAppName'))]"
   },
   "resources": [
     {
@@ -58,21 +57,33 @@
       "dependsOn": []
     },
     {
+      "comments": "App Service Plan set up for consumption based pricing for Function Apps",
+      "type": "Microsoft.Web/serverfarms",
+      "kind": "functionapp",
+      "name": "[parameters('appServicePlanName')]",
+      "apiVersion": "[variables('appServicePlanApiVersion')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "capacity": 0
+      },
+      "properties": {
+        "name": "[parameters('appServicePlanName')]",
+        "computeMode": "Dynamic"
+      },
+      "dependsOn": []
+    },
+    {
       "comments": "Function App that will have Azure Functions deployed to",
       "type": "Microsoft.Web/sites",
       "kind": "functionapp",
       "name": "[parameters('functionAppName')]",
       "apiVersion": "[variables('appServiceApiVersion')]",
       "location": "[parameters('location')]",
-      "tags": {
-        "[concat('hidden-related:', variables('jisCommonId'))]": "Resource",
-        "displayName": "AppService"
-      },
       "properties": {
-        "serverFarmId": "[variables('jisCommonId')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
         "siteConfig": {
-          "alwaysOn": true,
-          "managedPipelineMode": "Integrated",
           "appSettings": [
             {
               "name": "MSDEPLOY_RENAME_LOCKED_FILES",
@@ -117,7 +128,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
       ]
     }
   ],
