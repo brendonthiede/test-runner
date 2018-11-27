@@ -19,7 +19,7 @@ $today = (Get-Date)
 
 Write-Verbose "Pulling last 3 days worth of results"
 for ($i = 0; $i -lt 3; $i++) {
-  $prefix = $today.AddDays($i).ToString("yyyy-MM-dd")
+  $prefix = $today.AddDays(-$i).ToString("yyyy-MM-dd")
   $listUrl = "$StorageUrl/$Environment`?restype=container&comp=list&prefix=$prefix"
   $rawList = Invoke-RestMethod -Uri $listUrl
   $asXml = [xml]($rawList -replace "^[^<]*<", "<")
