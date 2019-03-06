@@ -16,9 +16,10 @@ param (
 
 [System.Collections.ArrayList]$Reports = New-Object System.Collections.ArrayList
 $today = (Get-Date)
+$daysToPull = 10
 
-Write-Verbose "Pulling last 3 days worth of results"
-for ($i = 0; $i -lt 3; $i++) {
+Write-Verbose "Pulling last $daysToPull days worth of results"
+for ($i = 0; $i -lt $daysToPull; $i++) {
   $prefix = $today.AddDays(-$i).ToString("yyyy-MM-dd")
   $listUrl = "$StorageUrl/$Environment`?restype=container&comp=list&prefix=$prefix"
   $rawList = Invoke-RestMethod -Uri $listUrl
