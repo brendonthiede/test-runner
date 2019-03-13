@@ -51,8 +51,12 @@ for ($i = 0; $i -lt $daysToPull; $i++) {
   }
 }
 
+$resultsFolder = "$PSScriptRoot\results\$Environment"
+Remove-Item -Path $resultsFolder -Force -Recurse -ErrorAction SilentlyContinue
+New-Item -Path $resultsFolder -ItemType Directory -Force
+
 $blobName = "reportlist.json"
-$fileName = "$PSScriptRoot\$blobName"
+$fileName = "$resultsFolder\$blobName"
 
 $Reports | ConvertTo-Json | Tee-Object -Variable reportJson | Set-Content -Path $fileName
 Write-Verbose "reportJson:`n$reportJson"
@@ -64,7 +68,7 @@ Write-Verbose "UploadUrl: $UploadUrl"
 Publish-BlobFile -uploadUrl $UploadUrl -fileToUpload $sourceFilePath -environment $Environment -blobName $blobName -Verbose:$VerbosePreference
 
 $blobName = "reportlist.html"
-$fileName = "$PSScriptRoot\$blobName"
+$fileName = "$resultsFolder\$blobName"
 
 Write-Verbose "Publishing reportlist HTML to Azure storage"
 $sourceFilePath = Get-FullPath($fileName)
