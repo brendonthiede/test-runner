@@ -68,7 +68,7 @@ Write-Verbose "UploadUrl: $UploadUrl"
 Publish-BlobFile -uploadUrl $UploadUrl -fileToUpload $sourceFilePath -environment $Environment -blobName $blobName -Verbose:$VerbosePreference
 
 $blobName = "reportlist.html"
-$fileName = "$resultsFolder\$blobName"
+$fileName = "$PSScriptRoot\$blobName"
 
 Write-Verbose "Publishing reportlist HTML to Azure storage"
 $sourceFilePath = Get-FullPath($fileName)
