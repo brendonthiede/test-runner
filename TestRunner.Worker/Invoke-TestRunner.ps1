@@ -74,6 +74,8 @@ if ($TestStatus -eq "Failed" -and $FailureSlackChannel -ne "") {
   .\Send-PSSlackMessage.ps1 -Message $Message -Channel $FailureSlackChannel
 }
 
+Remove-Item -Recurse -Force "$WorkingDirectory\testresults"
+
 Pop-Location
 
 Exit $TestExitCode
