@@ -16,7 +16,6 @@ param (
   $TestResultsFolder,
   [Parameter(Mandatory = $true)]
   [string]
-  [ValidateSet("ROA")]
   $ApplicationName,
   [Parameter(Mandatory = $false)]
   [string]
